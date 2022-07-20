@@ -7,6 +7,9 @@ Shader "Hidden/Pixelize"
     Properties
     {
         _MainTex ("Texture", 2D) = "white"
+        //_BlockCount ("Block count", Vector) = (0,0,0,0)
+        //_BlockSize ("Block size", Vector) = (0,0,0,0)
+        //_HalfBlockSize ("Block half size", Vector) = (0,0,0,0)
     }
 
     SubShader
@@ -40,7 +43,7 @@ Shader "Hidden/Pixelize"
         float4 _MainTex_TexelSize;
         float4 _MainTex_ST;
 
-        int _BlurStrength;
+        
         float2 _BlockCount;
         float2 _BlockSize;
         float2 _HalfBlockSize;
