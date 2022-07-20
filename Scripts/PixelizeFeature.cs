@@ -7,7 +7,7 @@ public class PixelizeFeature : ScriptableRendererFeature
     [System.Serializable]
     public class CustomPassSettings
     {
-        public RenderPassEvent renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
+        [HideInInspector] public RenderPassEvent renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
         public int screenHeight = 144;
     }
 
@@ -24,6 +24,10 @@ public class PixelizeFeature : ScriptableRendererFeature
     // This method is called when setting up the renderer once per-camera.
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
+#if UNITY_EDITOR
+        if (renderingData.cameraData.isSceneViewCamera) return;
+#endif
+
         renderer.EnqueuePass(customPass);
     }
 }

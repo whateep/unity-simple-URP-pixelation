@@ -13,20 +13,17 @@ public class PixelizePass : ScriptableRenderPass
     // We will store our pass settings in this variable.
     private PixelizeFeature.CustomPassSettings settings;
 
-    private RenderTargetIdentifier colorBuffer, temporaryBuffer;
-    private int temporaryBufferID = Shader.PropertyToID("_TemporaryBuffer");
-
+    private RenderTargetIdentifier colorBuffer,pointBuffer, pixelBuffer;
+    private int pointBufferID = Shader.PropertyToID("_PointBuffer");
+    private int pixelBufferID = Shader.PropertyToID("_PixelBuffer");
+    
     private Material material;
     private int pixelScreenHeight, pixelScreenWidth;
 
     public PixelizePass(PixelizeFeature.CustomPassSettings settings)
     {
         this.settings = settings;
-        // Configures where the render pass should be injected.
         this.renderPassEvent = settings.renderPassEvent;
-
-        // We create a material that will be used during our pass. You can do it like this using the 'CreateEngineMaterial' method, giving it
-        // a shader path as an input or you can use a 'public Material material;' field in your pass settings and access it here through 'passSettings.material'.
         if (material == null) material = CoreUtils.CreateEngineMaterial("Hidden/Pixelize");
     }
 
@@ -38,41 +35,44 @@ public class PixelizePass : ScriptableRenderPass
     public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
     {
         RenderTextureDescriptor descriptor = renderingData.cameraData.cameraTargetDescriptor;
-
         // Grab the color buffer from the renderer camera color target.
         colorBuffer = renderingData.cameraData.renderer.cameraColorTarget;
         
+        cmd.GetTemporaryRT(pointBufferID, descriptor.width, descriptor.height, 0, FilterMode.Point);
+        pointBuffer = new RenderTargetIdentifier(pointBufferID);
 
         pixelScreenHeight = settings.screenHeight;
         pixelScreenWidth = (int)(pixelScreenHeight * renderingData.cameraData.camera.aspect);
         material.SetVector("_BlockCount", new Vector2(pixelScreenWidth, pixelScreenHeight));
-        material.SetVector("_BlockSize", new Vector2(1.0f/pixelScreenWidth, 1.0f/pixelScreenHeight));
+        material.SetVector("_BlockSize", new Vector2(1.0f / pixelScreenWidth, 1.0f / pixelScreenHeight));
         material.SetVector("_HalfBlockSize", new Vector2(0.5f / pixelScreenWidth, 0.5f / pixelScreenHeight));
         descriptor.height = pixelScreenHeight;
         descriptor.width = pixelScreenWidth;
 
-        //cmd.GetTemporaryRT(temporaryBufferID, pixelScreenHeight, pixelScreenWidth, 0, FilterMode.Point);
-        cmd.GetTemporaryRT(temporaryBufferID, descriptor, FilterMode.Point);
 
-        temporaryBuffer = new RenderTargetIdentifier(temporaryBufferID);
+        //cmd.GetTemporaryRT(temporaryBufferID, pixelScreenHeight, pixelScreenWidth, 0, FilterMode.Point);
+        cmd.GetTemporaryRT(pixelBufferID, descriptor, FilterMode.Point);
+        pixelBuffer = new RenderTargetIdentifier(pixelBufferID);
+        
+
     }
 
-    // Here you can implement the rendering logic.
-    // Use <c>ScriptableRenderContext</c> to issue drawing commands or execute command buffers
-    // https://docs.unity3d.com/ScriptReference/Rendering.ScriptableRenderContext.html
-    // You don't have to call ScriptableRenderContext.submit, the render pipeline will call it at specific points in the pipeline.
     public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
     {
-        // Grab a command buffer. We put the actual execution of the pass inside of a profiling scope.
         CommandBuffer cmd = CommandBufferPool.Get();
         using (new ProfilingScope(cmd, new ProfilingSampler(ProfilerTag)))
         {
             // Blit from the color buffer to a temporary buffer and back. This is needed for a two-pass shader.
-            Blit(cmd, colorBuffer, temporaryBuffer, material, 0); // shader pass 0
-            Blit(cmd, temporaryBuffer, colorBuffer); // shader pass 1
-        }
+            // Bad antialiasing ??!?!?!?!
+            //Blit(cmd, colorBuffer, pixelBuffer, material);
+            //Blit(cmd, pixelBuffer, colorBuffer);
 
-        
+            // Remove antialiasing...I'm sure there's a clever-er way to do this...
+            Blit(cmd, colorBuffer, pointBuffer);
+            Blit(cmd, pointBuffer, pixelBuffer); // shader pass 0
+            Blit(cmd, pixelBuffer, colorBuffer);
+
+        }
         context.ExecuteCommandBuffer(cmd);
         CommandBufferPool.Release(cmd);
     }
@@ -86,6 +86,7 @@ public class PixelizePass : ScriptableRenderPass
         if (cmd == null) throw new System.ArgumentNullException("cmd");
 
         // Since we created a temporary render texture in OnCameraSetup, we need to release the memory here to avoid a leak.
-        cmd.ReleaseTemporaryRT(temporaryBufferID);
+        cmd.ReleaseTemporaryRT(pixelBufferID);
+        cmd.ReleaseTemporaryRT(pointBufferID);
     }
 }
