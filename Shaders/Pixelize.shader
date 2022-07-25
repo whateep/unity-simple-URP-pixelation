@@ -44,9 +44,9 @@ Shader "Hidden/Pixelize"
         float4 _MainTex_ST;
 
         
-        float2 _BlockCount;
-        float2 _BlockSize;
-        float2 _HalfBlockSize;
+        uniform float2 _BlockCount;
+        uniform float2 _BlockSize;
+        uniform float2 _HalfBlockSize;
 
         Varyings vert(Attributes IN)
         {
