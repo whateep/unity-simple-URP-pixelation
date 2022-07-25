@@ -62,15 +62,12 @@ public class PixelizePass : ScriptableRenderPass
         CommandBuffer cmd = CommandBufferPool.Get();
         using (new ProfilingScope(cmd, new ProfilingSampler(ProfilerTag)))
         {
-            // Blit from the color buffer to a temporary buffer and back. This is needed for a two-pass shader.
-            // Bad antialiasing ??!?!?!?!
-            //Blit(cmd, colorBuffer, pixelBuffer, material);
+            //Blit(cmd, colorBuffer, pointBuffer);
+            //Blit(cmd, pointBuffer, pixelBuffer); // shader pass 0
             //Blit(cmd, pixelBuffer, colorBuffer);
 
-            // Remove antialiasing...I'm sure there's a clever-er way to do this...
             Blit(cmd, colorBuffer, pointBuffer);
-            Blit(cmd, pointBuffer, pixelBuffer); // shader pass 0
-            Blit(cmd, pixelBuffer, colorBuffer);
+            Blit(cmd, pointBuffer, colorBuffer, material); // shader pass 0
 
         }
         context.ExecuteCommandBuffer(cmd);
