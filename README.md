@@ -10,6 +10,11 @@ The code might not be optimized since I don't really know how the RendererFeatur
 ## Usage
 To use this, go to your renderer settings and add the PixelizeFeature. Set your target height and you're on :)
 
+Commented code in the shader and in the PixelizePass class is for alternate versions of this effect that either:
+- Don't use the shader
+- Don't down scale the render texture in the first blit pass
+Un-comment at your own risk lmao
+
 ## Resources
 - Custom render passes (by @alexanderameye): https://alexanderameye.github.io/notes/scriptable-render-passes/
 - Custom render passes: https://learn.unity.com/tutorial/custom-render-passes-with-urp
