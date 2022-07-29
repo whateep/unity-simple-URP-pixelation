@@ -1,15 +1,10 @@
-// Two-pass box blur shader created for URP 12 and Unity 2021.2
-// Made by Alexander Ameye 
-// https://alexanderameye.github.io/
+
 
 Shader "Hidden/Pixelize"
 {
     Properties
     {
         _MainTex ("Texture", 2D) = "white"
-        //_BlockCount ("Block count", Vector) = (0,0,0,0)
-        //_BlockSize ("Block size", Vector) = (0,0,0,0)
-        //_HalfBlockSize ("Block half size", Vector) = (0,0,0,0)
     }
 
     SubShader
@@ -38,15 +33,19 @@ Shader "Hidden/Pixelize"
         };
 
         TEXTURE2D(_MainTex);
-
-        SAMPLER(sampler_MainTex);
         float4 _MainTex_TexelSize;
         float4 _MainTex_ST;
 
+        //SAMPLER(sampler_MainTex);
+        //Texture2D _MainTex;
+        //SamplerState sampler_MainTex;
+
+        SamplerState sampler_point_clamp;
         
         uniform float2 _BlockCount;
         uniform float2 _BlockSize;
         uniform float2 _HalfBlockSize;
+
 
         Varyings vert(Attributes IN)
         {
@@ -55,6 +54,7 @@ Shader "Hidden/Pixelize"
             OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
             return OUT;
         }
+
         ENDHLSL
 
         Pass
@@ -67,7 +67,7 @@ Shader "Hidden/Pixelize"
                 float2 blockPos = floor(IN.uv * _BlockCount);
                 float2 blockCenter = blockPos * _BlockSize + _HalfBlockSize;
 
-                float4 tex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, blockCenter);
+                float4 tex = SAMPLE_TEXTURE2D(_MainTex, sampler_point_clamp, blockCenter);
 				//return float4(IN.uv,1,1);
 
                 return tex;
