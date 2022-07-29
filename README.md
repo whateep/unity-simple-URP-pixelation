@@ -11,8 +11,8 @@ The code might not be optimized since I don't really know how the RendererFeatur
 To use this, go to your renderer settings and add the PixelizeFeature. Set your target height and you're on :)
 
 ## Resources
-Custom render passes (by @alexanderameye): https://alexanderameye.github.io/notes/scriptable-render-passes/
-Custom render passes: https://learn.unity.com/tutorial/custom-render-passes-with-urp
-Create a custom renderer feature: https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@12.1/manual/containers/create-custom-renderer-feature-1.html
-SamplerStates in shader lab: https://docs.unity3d.com/Manual/SL-SamplerStates.html
+- Custom render passes (by @alexanderameye): https://alexanderameye.github.io/notes/scriptable-render-passes/
+- Custom render passes: https://learn.unity.com/tutorial/custom-render-passes-with-urp
+- Create a custom renderer feature: https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@12.1/manual/containers/create-custom-renderer-feature-1.html
+- SamplerStates in shader lab: https://docs.unity3d.com/Manual/SL-SamplerStates.html
 
