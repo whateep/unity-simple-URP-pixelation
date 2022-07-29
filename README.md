@@ -13,6 +13,7 @@ To use this, go to your renderer settings and add the PixelizeFeature. Set your 
 Commented code in the shader and in the PixelizePass class is for alternate versions of this effect that either:
 - Don't use the shader
 - Don't down scale the render texture in the first blit pass
+
 Un-comment at your own risk lmao
 
 ## Resources
